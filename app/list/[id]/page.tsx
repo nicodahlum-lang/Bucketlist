@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, Circle, Share2, Plus } from "lucide-react";
+import { CheckCircle2, Circle, Share2, Plus, Trash2 } from "lucide-react";
+import Toast from "@/app/components/Toast";
 
 interface Item {
   id: string;
@@ -18,6 +19,7 @@ export default function ListPage() {
   const [loading, setLoading] = useState(true);
   const [newItemText, setNewItemText] = useState("");
   const [activeCategory, setActiveCategory] = useState("");
+  const [toast, setToast] = useState({ visible: false, message: "" });
 
   useEffect(() => {
     async function fetchItems() {
@@ -29,6 +31,11 @@ export default function ListPage() {
     }
     fetchItems();
   }, [listId]);
+
+  const showToast = (message: string) => {
+    setToast({ visible: true, message });
+    setTimeout(() => setToast({ visible: false, message: "" }), 3000);
+  };
 
   const toggleItem = async (id: string, currentStatus: boolean) => {
     setItems(prev => prev.map(item => item.id === id ? { ...item, completed: !currentStatus } : item));
@@ -49,14 +56,27 @@ export default function ListPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newItem),
     });
-    const addedItem = await res.json();
-    setItems([...items, addedItem]);
-    setNewItemText("");
+    if (res.ok) {
+      const addedItem = await res.json();
+      setItems([...items, addedItem]);
+      setNewItemText("");
+      showToast("Neue Idee hinzugefügt! 🚀");
+    }
+  };
+
+  const deleteItem = async (id: string) => {
+    if (!confirm("Möchtest du dieses Item wirklich löschen?")) return;
+    
+    setItems(prev => prev.filter(item => item.id !== id));
+    await fetch(`/api/list/item/${id}`, {
+      method: "DELETE",
+    });
+    showToast("Item gelöscht 🗑️");
   };
 
   const shareList = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert("Link kopiert! Teile ihn mit deinen Liebsten ❤️");
+    showToast("Link kopiert! Teile ihn mit deinen Liebsten ❤️");
   };
 
   if (loading) return <div className="flex items-center justify-center min-h-screen text-gray-500 font-light">Lade Abenteuer...</div>;
@@ -65,6 +85,11 @@ export default function ListPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6 py-16">
+      <Toast 
+        isVisible={toast.visible} 
+        message={toast.message} 
+        onClose={() => setToast({ ...toast, visible: false })} 
+      />
       <div className="flex items-center justify-between mb-16">
         <motion.h1 
           initial={{ opacity: 0, x: -20 }}
@@ -110,6 +135,15 @@ export default function ListPage() {
                         {item.text}
                       </span>
                     </div>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteItem(item.id);
+                      }}
+                      className="p-2 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </motion.div>
                 ))}
               </AnimatePresence>
