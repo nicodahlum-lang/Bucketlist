@@ -32,41 +32,42 @@ export default function HomePage() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
         className="max-w-2xl"
       >
-        <div className="flex justify-center mb-6">
-          <div className="p-4 bg-accent-primary/20 rounded-full ring-2 ring-accent-primary/50">
-            <Sparkles className="w-12 h-12 text-accent-primary" />
+        <div className="flex justify-center mb-8">
+          <div className="p-4 bg-accent-primary/10 rounded-2xl ring-1 ring-accent-primary/30">
+            <Sparkles className="w-10 h-10 text-accent-primary" />
           </div>
         </div>
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-glow">
+        <h1 className="text-6xl md:text-8xl font-extrabold mb-6 tracking-tighter text-glow">
           Bucket <span className="text-accent-primary">List</span>
         </h1>
-        <p className="text-gray-400 text-lg mb-12 max-w-md mx-auto">
+        <p className="text-gray-400 text-lg mb-12 max-w-md mx-auto font-light">
           Halte eure Träume fest, plant eure Abenteuer und hake gemeinsam eure Highlights ab.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => createNewList(false)}
             disabled={loading}
-            className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-black font-bold rounded-2xl transition-all hover:bg-gray-200 disabled:opacity-50"
+            className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-black font-semibold rounded-xl transition-all hover:bg-gray-100 disabled:opacity-50"
           >
             <PlusCircle className="w-5 h-5" />
-            Neue Liste erstellen
+            Neue Liste
           </motion.button>
 
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => createNewList(true)}
             disabled={loading}
-            className="flex items-center justify-center gap-2 px-8 py-4 bg-accent-primary text-white font-bold rounded-2xl transition-all hover:bg-blue-600 shadow-lg shadow-accent-primary/30 disabled:opacity-50"
+            className="flex items-center justify-center gap-2 px-8 py-4 bg-accent-primary text-white font-semibold rounded-xl transition-all hover:bg-purple-600 shadow-lg shadow-accent-primary/20 disabled:opacity-50"
           >
             <Rocket className="w-5 h-5" />
-            Meine Vorlage laden
+            Vorlage laden
           </motion.button>
         </div>
       </motion.div>

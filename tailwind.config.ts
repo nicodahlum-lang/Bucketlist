@@ -9,18 +9,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0B0E11",
-        foreground: "#F0F2F5",
+        background: "#09090B",
+        foreground: "#FAFAFA",
         accent: {
-          primary: "#3B82F6",
-          secondary: "#A855F7",
-          glass: "rgba(255, 255, 255, 0.05)",
-          border: "rgba(255, 255, 255, 0.1)",
+          primary: "#A855F7",
+          secondary: "#C084FC",
+          glass: "rgba(255, 255, 255, 0.03)",
+          border: "rgba(255, 255, 255, 0.08)",
         },
       },
       backgroundImage: {
-        "liquid-gradient": "radial-gradient(circle at top left, #1E293B, #0B0E11)",
-        "glow-mesh": "radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15), transparent 50%)",
+        "matte-gradient": "radial-gradient(circle at center, #18181B, #09090B)",
+        "purple-glow": "radial-gradient(circle at 50% -20%, rgba(168, 85, 247, 0.15), transparent 70%)",
       },
     },
   },

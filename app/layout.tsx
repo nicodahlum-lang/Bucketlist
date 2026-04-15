@@ -16,8 +16,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de" className="dark">
-      <body className={`${inter.className} bg-background text-foreground min-h-screen selection:bg-accent-primary selection:text-white`}>
-        <div className="fixed inset-0 bg-glow-mesh pointer-events-none z-0" />
+      <body className={`${inter.className} bg-background text-foreground min-h-screen selection:bg-accent-primary/30 selection:text-white`}>
+        <div className="fixed inset-0 bg-purple-glow pointer-events-none z-0" />
         <main className="relative z-10">{children}</main>
       </body>
     </html>

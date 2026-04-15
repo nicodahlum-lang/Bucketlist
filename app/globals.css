@@ -4,28 +4,34 @@
 
 :root {
   --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-blur: blur(12px);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(16px);
 }
 
 body {
-  background-image: radial-gradient(circle at top left, #1e293b, #0b0e11);
+  background-image: radial-gradient(circle at center, #18181B, #09090B);
   background-attachment: fixed;
+  color: #FAFAFA;
 }
 
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border-radius: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(168, 85, 247, 0.3);
 }
 
 .text-glow {
-  text-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
 }
 
 .checkbox-glow:checked {
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
-  border-color: #3B82F6;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+  border-color: #A855F7;
 }
