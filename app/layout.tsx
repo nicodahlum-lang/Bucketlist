@@ -33,7 +33,11 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} bg-background text-foreground min-h-screen selection:bg-accent-primary/30 selection:text-white`}>
         <AuthProvider>
-          <div className="fixed inset-0 bg-purple-glow pointer-events-none z-0" />
+          <div className="purple-glow">
+            <div className="glow-blob blob-1" />
+            <div className="glow-blob blob-2" />
+            <div className="glow-blob blob-3" />
+          </div>
           <main className="relative z-10">{children}</main>
         </AuthProvider>
       </body>
