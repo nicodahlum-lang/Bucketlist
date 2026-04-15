@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { getUserLists, getUserById } from "@/lib/db";
+import { getUserLists, getUserById, getUserGlobalStats } from "@/lib/db";
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,17 +11,23 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Find the user in the DB by email to get the UUID
     const user = await getUserByIdByEmail(session.user.email);
     
     if (!user) {
       return NextResponse.json({ error: "User not found in database" }, { status: 404 });
     }
 
-    const lists = await getUserLists(user.id);
-    return NextResponse.json(lists);
+    const [lists, stats] = await Promise.all([
+      getUserLists(user.id),
+      getUserGlobalStats(user.id)
+    ]);
+
+    return NextResponse.json({
+      lists,
+      stats
+    });
   } catch (e) {
-    console.error("Fetch User Lists Error:", e);
+    console.error("Fetch User Dashboard Error:", e);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

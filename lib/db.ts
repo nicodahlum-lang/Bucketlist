@@ -66,8 +66,36 @@ export async function createList(name: string, userId?: string) {
 
 export async function getUserLists(userId: string) {
   await initDb();
-  const result = await sql`SELECT * FROM lists WHERE user_id = ${userId} ORDER BY created_at DESC`;
+  
+  // Get lists with their completion stats
+  const result = await sql`
+    SELECT 
+      l.id, 
+      l.name, 
+      l.created_at,
+      COUNT(i.id) as total_items,
+      COUNT(i.id) FILTER (WHERE i.completed = true) as completed_items
+    FROM lists l
+    LEFT JOIN items i ON l.id = i.list_id
+    WHERE l.user_id = ${userId}
+    GROUP BY l.id
+    ORDER BY l.created_at DESC;
+  `;
   return result.rows;
+}
+
+export async function getUserGlobalStats(userId: string) {
+  await initDb();
+  const result = await sql`
+    SELECT 
+      COUNT(DISTINCT l.id) as total_lists,
+      COUNT(i.id) as total_items,
+      COUNT(i.id) FILTER (WHERE i.completed = true) as total_completed
+    FROM lists l
+    JOIN items i ON l.id = i.list_id
+    WHERE l.user_id = ${userId};
+  `;
+  return result.rows[0];
 }
 
 export async function createItems(listId: string, items: {category: string, text: string}[]) {
