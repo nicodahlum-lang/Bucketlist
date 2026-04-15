@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createList, createItems } from "@/lib/db";
-import { v4 as uuidv4 } from "uuid"; // In a real app, I'd use a UUID library or postgres gen_random_uuid()
 
-// Predefined data from the user
 const PREDEFINED_DATA = [
   { category: "🎬 Entspannt & Cozy Dates", items: ["Kino-Date 🍿", "Sushi essen 🍣", "Gemeinsam kochen", "Raphs BBQ 🌾🔥", "Köln-Date: Omis Hauskost 🥰", "Spieleabend 🎮", "Filmabend mit Motto"] },
   { category: "🎢 Action & Spaß", items: ["Paintball 💥", "KLETTERpark 🌲", "Eislaufen ⛸️", "Bowling 🎳", "Trampolinpark 🤸‍♀️", "Escape Room 🧩", "Schwarzlicht-Minigolf ⛳✨", "Kartfahren"] },
@@ -16,8 +14,6 @@ const PREDEFINED_DATA = [
 export async function POST(req: NextRequest) {
   try {
     const { name, predefined } = await req.json();
-    
-    // Vercel Postgres often handles UUIDs internally, but for the route we return the id
     const listId = await createList(name);
 
     if (predefined) {
@@ -29,6 +25,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ id: listId });
   } catch (e) {
+    console.error("Create List Error:", e);
     return NextResponse.json({ error: "Failed to create list" }, { status: 500 });
   }
 }
