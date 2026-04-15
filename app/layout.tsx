@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import AuthProvider from "./auth-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,8 +18,10 @@ export default function RootLayout({
   return (
     <html lang="de" className="dark">
       <body className={`${inter.className} bg-background text-foreground min-h-screen selection:bg-accent-primary/30 selection:text-white`}>
-        <div className="fixed inset-0 bg-purple-glow pointer-events-none z-0" />
-        <main className="relative z-10">{children}</main>
+        <AuthProvider>
+          <div className="fixed inset-0 bg-purple-glow pointer-events-none z-0" />
+          <main className="relative z-10">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );
