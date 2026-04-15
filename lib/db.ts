@@ -48,6 +48,12 @@ export async function createUser(email: string, name?: string, image?: string) {
   return result.rows[0].id;
 }
 
+export async function getUserByIdByEmail(email: string) {
+  await initDb();
+  const result = await sql`SELECT * FROM users WHERE email = ${email}`;
+  return result.rows[0];
+}
+
 export async function getUserById(id: string) {
   await initDb();
   const result = await sql`SELECT * FROM users WHERE id = ${id}`;

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createList, createItems } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { createList, createItems, getUserByIdByEmail } from "@/lib/db";
 
 const PREDEFINED_DATA = [
   { category: "🎬 Entspannt & Cozy Dates", items: ["Kino-Date 🍿", "Sushi essen 🍣", "Gemeinsam kochen", "Raphs BBQ 🌾🔥", "Köln-Date: Omis Hauskost 🥰", "Spieleabend 🎮", "Filmabend mit Motto"] },
@@ -13,8 +15,18 @@ const PREDEFINED_DATA = [
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await getUserByIdByEmail(session.user.email);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     const { name, predefined } = await req.json();
-    const listId = await createList(name);
+    const listId = await createList(name, user.id);
 
     if (predefined) {
       const flatItems = PREDEFINED_DATA.flatMap(cat => 
