@@ -32,8 +32,9 @@ export default function ListPage() {
 
   const toggleItem = async (id: string, currentStatus: boolean) => {
     setItems(prev => prev.map(item => item.id === id ? { ...item, completed: !currentStatus } : item));
-    await fetch(`/api/list/${listId}/toggle`, {
+    await fetch(`/api/list/${listId}`, {
       method: "PATCH",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, completed: !currentStatus }),
     });
   };
@@ -42,9 +43,10 @@ export default function ListPage() {
     e.preventDefault();
     if (!newItemText.trim()) return;
 
-    const newItem = { text: newItemText, category: activeCategory || "Allgemein" };
-    const res = await fetch(`/api/list/${listId}/item`, {
+    const newItem = { text: newItemText, category: activeCategory || "✨ Eigene Ideen" };
+    const res = await fetch(`/api/list/${listId}`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newItem),
     });
     const addedItem = await res.json();
