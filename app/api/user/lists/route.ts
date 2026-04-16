@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
-import { getUserLists, getUserById, getUserGlobalStats } from "../../../../lib/db";
+import { authOptions } from "../../../../lib/auth";
+import { getUserLists, getUserGlobalStats, getUserByIdByEmail } from "../../../../lib/db";
 
 export async function GET(req: NextRequest) {
   try {
@@ -30,10 +30,4 @@ export async function GET(req: NextRequest) {
     console.error("Fetch User Dashboard Error:", e);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
-}
-
-async function getUserByIdByEmail(email: string) {
-  const { sql } = await import('@vercel/postgres');
-  const result = await sql`SELECT * FROM users WHERE email = ${email}`;
-  return result.rows[0];
 }

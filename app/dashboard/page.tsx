@@ -47,13 +47,26 @@ export default function Dashboard() {
     if (status === "unauthenticated") {
       router.push("/login");
     } else if (status === "authenticated") {
-      async function fetchDashboard() {
-        const res = await fetch("/api/user/lists");
-        const data = await res.json();
-        if (data.lists) setLists(data.lists);
-        if (data.stats) setStats(data.stats);
-        setLoading(false);
-      }
+      const fetchDashboard = async () => {
+        try {
+          const res = await fetch("/api/user/lists");
+          if (!res.ok) {
+            console.error("Failed to fetch dashboard:", res.status);
+            setLists([]);
+            setStats(null);
+          } else {
+            const data = await res.json();
+            if (data.lists) setLists(data.lists);
+            if (data.stats) setStats(data.stats);
+          }
+        } catch (error) {
+          console.error("Error fetching dashboard:", error);
+          setLists([]);
+          setStats(null);
+        } finally {
+          setLoading(false);
+        }
+      };
       fetchDashboard();
     } else {
       setLoading(true);
@@ -61,13 +74,23 @@ export default function Dashboard() {
   }, [status, router]);
 
   const createNewList = async (isPredefined = false) => {
-    const name = isPredefined ? "Unsere Abenteuer" : "Neue Liste";
-    const res = await fetch("/api/list/create", {
-      method: "POST",
-      body: JSON.stringify({ name, predefined: isPredefined }),
-    });
-    const data = await res.json();
-    router.push(`/list/${data.id}`);
+    try {
+      const name = isPredefined ? "Unsere Abenteuer" : "Neue Liste";
+      const res = await fetch("/api/list/create", {
+        method: "POST",
+        body: JSON.stringify({ name, predefined: isPredefined }),
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      if (data.id) {
+        router.push(`/list/${data.id}`);
+      }
+    } catch (error) {
+      console.error("Error creating list:", error);
+      alert("Fehler beim Erstellen der Liste. Bitte versuche es später erneut.");
+    }
   };
 
   if (status === "loading" || loading) {
@@ -90,14 +113,14 @@ export default function Dashboard() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-5xl font-bold tracking-tighter text-glow">Mein <span className="text-accent-primary">Dashboard</span></h1>
-          <p className="text-gray-400 font-light mt-2 opacity-80">Willkommen zurück, {session?.user?.name}!</p>
+          <h1 className="text-5xl font-bold tracking-tighter text-foreground">Mein <span className="text-accent-primary">Dashboard</span></h1>
+          <p className="text-gray-600 font-light mt-2 opacity-90">Willkommen zurück, {session?.user?.name}!</p>
         </motion.div>
         <motion.button 
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           onClick={() => signOut()}
-          className="p-3 bg-accent-glass border border-accent-border rounded-xl hover:bg-red-500/20 transition-all text-gray-400 hover:text-red-400"
+          className="p-3 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-all text-red-500 hover:text-red-600"
         >
           <LogOut className="w-5 h-5" />
         </motion.button>
@@ -118,8 +141,8 @@ export default function Dashboard() {
             className="glass-card p-8 flex flex-col justify-center items-center text-center space-y-3 group hover:border-accent-primary/40 transition-all"
           >
             <stat.icon className="w-8 h-8 text-accent-primary mb-2 group-hover:scale-110 transition-transform duration-300" />
-            <span className="text-5xl font-bold tracking-tighter">{stat.value}</span>
-            <span className="text-gray-400 text-sm font-light uppercase tracking-widest opacity-70">{stat.label}</span>
+            <span className="text-5xl font-bold tracking-tighter text-foreground">{stat.value}</span>
+            <span className="text-gray-600 text-sm font-light uppercase tracking-widest opacity-80">{stat.label}</span>
           </motion.div>
         ))}
       </div>
@@ -131,10 +154,10 @@ export default function Dashboard() {
           onClick={() => createNewList(false)}
           className="glass-card p-8 flex flex-col items-center justify-center gap-4 hover:border-accent-primary/50 transition-all group"
         >
-          <div className="p-4 bg-accent-primary/10 rounded-full group-hover:bg-accent-primary/20 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all">
+          <div className="p-4 bg-accent-primary/10 rounded-full group-hover:bg-accent-primary/20 group-hover:shadow-[0_0_20px_rgba(124,58,237,0.3)] transition-all">
             <Plus className="w-6 h-6 text-accent-primary" />
           </div>
-          <span className="font-semibold tracking-tight">Neue Liste erstellen</span>
+          <span className="font-semibold tracking-tight text-foreground">Neue Liste erstellen</span>
         </motion.button>
         <motion.button 
           whileHover={{ y: -5, scale: 1.02 }}
@@ -142,10 +165,10 @@ export default function Dashboard() {
           onClick={() => createNewList(true)}
           className="glass-card p-8 flex flex-col items-center justify-center gap-4 hover:border-accent-primary/50 transition-all group"
         >
-          <div className="p-4 bg-accent-primary/10 rounded-full group-hover:bg-accent-primary/20 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all">
+          <div className="p-4 bg-accent-primary/10 rounded-full group-hover:bg-accent-primary/20 group-hover:shadow-[0_0_20px_rgba(124,58,237,0.3)] transition-all">
             <Rocket className="w-6 h-6 text-accent-primary" />
           </div>
-          <span className="font-semibold tracking-tight">Vorlage laden</span>
+          <span className="font-semibold tracking-tight text-foreground">Vorlage laden</span>
         </motion.button>
         <div className="glass-card p-8 flex flex-col items-center justify-center gap-4 opacity-40 grayscale">
           <div className="p-4 bg-gray-500/10 rounded-full">
@@ -159,7 +182,7 @@ export default function Dashboard() {
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.4 }}
-        className="text-2xl font-semibold mb-8 px-1 tracking-tight"
+        className="text-2xl font-semibold mb-8 px-1 tracking-tight text-foreground"
       >
         Meine Listen
       </motion.h2>
@@ -189,21 +212,21 @@ export default function Dashboard() {
                 className="glass-card p-6 cursor-pointer hover:border-accent-primary/50 transition-all flex flex-col justify-between group"
               >
                 <div>
-                  <h3 className="text-xl font-medium mb-6 group-hover:text-accent-primary transition-colors">{list.name}</h3>
-                  <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mb-3">
+                  <h3 className="text-xl font-medium mb-6 text-foreground group-hover:text-accent-primary transition-colors">{list.name}</h3>
+                  <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-3">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
                       transition={{ duration: 1, delay: 0.5 }}
-                      className="bg-accent-primary h-full shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+                      className="bg-accent-primary h-full shadow-[0_0_10px_rgba(124,58,237,0.4)]"
                     />
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500 font-light">{list.completed_items}/{list.total_items} erledigt</span>
+                    <span className="text-xs text-gray-600 font-light">{list.completed_items}/{list.total_items} erledigt</span>
                     <span className="text-xs font-bold text-accent-primary tracking-tighter">{progress}%</span>
                   </div>
                 </div>
-                <p className="text-[10px] uppercase tracking-widest text-gray-600 mt-8 opacity-60">Erstellt am {new Date(list.created_at).toLocaleDateString()}</p>
+                <p className="text-[10px] uppercase tracking-widest text-gray-500 mt-8 opacity-70">Erstellt am {new Date(list.created_at).toLocaleDateString()}</p>
               </motion.div>
             );
           })

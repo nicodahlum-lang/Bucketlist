@@ -24,14 +24,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="de" className="dark">
+    <html lang="de">
       <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="light" />
         <meta name="apple-mobile-web-app-title" content="Bucketlist" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
-      <body className={`${inter.className} bg-background text-foreground min-h-screen selection:bg-accent-primary/30 selection:text-white`}>
+      <body className={`${inter.className} bg-background text-foreground min-h-screen selection:bg-accent-primary/20 selection:text-accent-primary`}>
         <AuthProvider>
           <div className="purple-glow">
             <div className="glow-blob blob-1" />

@@ -17,8 +17,8 @@ export default function Toast({ message, isVisible, onClose }: ToastProps) {
           exit={{ opacity: 0, y: 20, scale: 0.9 }}
           className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs px-4"
         >
-          <div className="glass-card p-4 text-center shadow-2xl border-accent-primary/30 bg-background/80">
-            <p className="text-sm font-medium text-gray-200">{message}</p>
+          <div className="glass-card p-4 text-center shadow-2xl border-accent-primary/30 bg-white/90">
+            <p className="text-sm font-medium text-foreground">{message}</p>
             <button 
               onClick={onClose}
               className="mt-2 text-xs text-accent-primary hover:underline"

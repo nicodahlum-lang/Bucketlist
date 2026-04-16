@@ -21,13 +21,29 @@ export default function ListPage() {
   const [activeCategory, setActiveCategory] = useState("");
   const [toast, setToast] = useState({ visible: false, message: "" });
 
+  if (!listId) {
+    return <div className="flex items-center justify-center min-h-screen text-gray-500 font-light">Ungültige Abenteuer-ID</div>;
+  }
+
   useEffect(() => {
+    if (!listId) return;
+    
     async function fetchItems() {
-      const res = await fetch(`/api/list/${listId}`);
-      const data = await res.json();
-      setItems(data);
-      if (data.length > 0) setActiveCategory(data[0].category);
-      setLoading(false);
+      try {
+        const res = await fetch(`/api/list/${listId}`);
+        const data = await res.json();
+        if (res.ok && Array.isArray(data)) {
+          setItems(data);
+          if (data.length > 0) setActiveCategory(data[0].category);
+        } else {
+          setItems([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch items:", error);
+        setItems([]);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchItems();
   }, [listId]);
@@ -39,28 +55,38 @@ export default function ListPage() {
 
   const toggleItem = async (id: string, currentStatus: boolean) => {
     setItems(prev => prev.map(item => item.id === id ? { ...item, completed: !currentStatus } : item));
-    await fetch(`/api/list/${listId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, completed: !currentStatus }),
-    });
+    try {
+      await fetch(`/api/list/${listId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, completed: !currentStatus }),
+      });
+    } catch (error) {
+      console.error("Error toggling item:", error);
+    }
   };
 
   const addItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItemText.trim()) return;
+    if (!newItemText.trim() || !listId) return;
 
     const newItem = { text: newItemText, category: activeCategory || "✨ Eigene Ideen" };
-    const res = await fetch(`/api/list/${listId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newItem),
-    });
-    if (res.ok) {
-      const addedItem = await res.json();
-      setItems([...items, addedItem]);
-      setNewItemText("");
-      showToast("Neue Idee hinzugefügt! 🚀");
+    try {
+      const res = await fetch(`/api/list/${listId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newItem),
+      });
+      if (res.ok) {
+        const addedItem = await res.json();
+        setItems([...items, addedItem]);
+        setNewItemText("");
+        showToast("Neue Idee hinzugefügt! 🚀");
+      } else {
+        console.error("Failed to add item:", res.status);
+      }
+    } catch (error) {
+      console.error("Error adding item:", error);
     }
   };
 
@@ -68,10 +94,15 @@ export default function ListPage() {
     if (!confirm("Möchtest du dieses Item wirklich löschen?")) return;
     
     setItems(prev => prev.filter(item => item.id !== id));
-    await fetch(`/api/list/item/${id}`, {
-      method: "DELETE",
-    });
-    showToast("Item gelöscht 🗑️");
+    try {
+      await fetch(`/api/list/item/${id}`, {
+        method: "DELETE",
+      });
+      showToast("Item gelöscht 🗑️");
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      showToast("Fehler beim Löschen des Items");
+    }
   };
 
   const shareList = () => {
@@ -94,7 +125,7 @@ export default function ListPage() {
         <motion.h1 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="text-4xl font-bold tracking-tight text-glow"
+          className="text-4xl font-bold tracking-tight text-foreground"
         >
           Unsere Bucket List <span className="text-accent-primary">✨</span>
         </motion.h1>
@@ -102,7 +133,7 @@ export default function ListPage() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={shareList}
-          className="p-3 bg-accent-glass border border-accent-border rounded-xl hover:bg-accent-primary/20 transition-all text-gray-400 hover:text-white"
+          className="p-3 bg-accent-primary/10 border border-accent-border rounded-xl hover:bg-accent-primary/20 transition-all text-accent-primary"
         >
           <Share2 className="w-5 h-5" />
         </motion.button>
@@ -129,9 +160,9 @@ export default function ListPage() {
                       {item.completed ? (
                         <CheckCircle2 className="w-6 h-6 text-accent-primary transition-all" />
                       ) : (
-                        <Circle className="w-6 h-6 text-gray-700 group-hover:text-accent-primary/50 transition-all" />
+                        <Circle className="w-6 h-6 text-gray-300 group-hover:text-accent-primary/50 transition-all" />
                       )}
-                      <span className={`text-lg font-light transition-all ${item.completed ? "line-through text-gray-600" : "text-gray-300"}`}>
+                      <span className={`text-lg font-light transition-all ${item.completed ? "line-through text-gray-500" : "text-foreground"}`}>
                         {item.text}
                       </span>
                     </div>
@@ -140,7 +171,7 @@ export default function ListPage() {
                         e.stopPropagation();
                         deleteItem(item.id);
                       }}
-                      className="p-2 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                      className="p-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -163,9 +194,9 @@ export default function ListPage() {
             value={newItemText}
             onChange={(e) => setNewItemText(e.target.value)}
             placeholder="Neue Idee hinzufügen..."
-            className="bg-transparent border-none focus:ring-0 flex-1 px-4 py-2 text-white placeholder:text-gray-600 font-light"
+            className="bg-transparent border-none focus:ring-0 flex-1 px-4 py-2 text-foreground placeholder:text-gray-400 font-light"
           />
-          <button type="submit" className="p-3 bg-accent-primary text-white rounded-lg hover:bg-purple-600 transition-all shadow-lg shadow-accent-primary/20">
+          <button type="submit" className="p-3 bg-accent-primary text-white rounded-lg hover:bg-accent-primary/90 transition-all shadow-sm">
             <Plus className="w-5 h-5" />
           </button>
         </div>
