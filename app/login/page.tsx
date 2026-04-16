@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { LogIn, LogOut, User, Rocket, PlusCircle } from "lucide-react";
