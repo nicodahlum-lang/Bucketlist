@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { createList, createItems, getUserByIdByEmail } from "@/lib/db";
+import { authOptions } from "../../auth/[...nextauth]/route";
+import { createList, createItems, getUserByIdByEmail } from "../../../../lib/db";
 
 const PREDEFINED_DATA = [
   { category: "🎬 Entspannt & Cozy Dates", items: ["Kino-Date 🍿", "Sushi essen 🍣", "Gemeinsam kochen", "Raphs BBQ 🌾🔥", "Köln-Date: Omis Hauskost 🥰", "Spieleabend 🎮", "Filmabend mit Motto"] },

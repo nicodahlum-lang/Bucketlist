@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getListItems, toggleItem } from "@/lib/db";
+import { getListItems, toggleItem } from "../../../../lib/db";
 import { sql } from '@vercel/postgres';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {

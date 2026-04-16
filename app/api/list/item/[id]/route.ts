@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteItem } from "@/lib/db";
+import { deleteItem } from "../../../../../lib/db";
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Circle, Share2, Plus, Trash2 } from "lucide-react";
-import Toast from "@/app/components/Toast";
+import Toast from "../../components/Toast";
 
 interface Item {
   id: string;
